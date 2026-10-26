@@ -1,3 +1,9 @@
+# pnpm 10: dependencias cuyos scripts de compilación no se ejecutan.
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# pnpm 11 reemplazó la opción anterior por allowBuilds (false = no ejecutar).
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
