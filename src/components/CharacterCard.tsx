@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getStatusColor } from '@/lib/utils';
 import { Character } from '@/types/rickandmorty';
 
 interface CharacterCardProps {
@@ -7,12 +8,6 @@ interface CharacterCardProps {
 }
 
 export default function CharacterCard({ character }: CharacterCardProps) {
-  const statusColor = {
-    Alive: 'bg-green-500',
-    Dead: 'bg-red-500',
-    unknown: 'bg-gray-500',
-  };
-
   return (
     <Link href={`/character/${character.id}`} className="block group">
       <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl border border-gray-700">
@@ -31,7 +26,7 @@ export default function CharacterCard({ character }: CharacterCardProps) {
             {character.name}
           </h2>
           <div className="flex items-center space-x-2 mb-2">
-            <span className={`h-3 w-3 rounded-full ${statusColor[character.status] || 'bg-gray-500'}`} />
+            <span className={`h-3 w-3 rounded-full ${getStatusColor(character.status)}`} aria-hidden="true" />
             <span className="text-gray-300 font-medium">
               {character.status} - {character.species}
             </span>

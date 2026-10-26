@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCharacter, getCharacters, getEpisodes } from "@/lib/api";
+import { ApiError, getCharacter, getCharacters, getEpisodes } from "@/lib/api";
 import { jsonResponse, makeCharacter, makeCharacterResponse, makeEpisode } from "../fixtures/rickandmorty";
 
 const API = "https://rickandmortyapi.com/api";
@@ -40,7 +40,7 @@ describe("getCharacters", () => {
   it("lanza un error cuando la API responde con un estado HTTP de error", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ error: "There is nothing here" }, 404));
 
-    await expect(getCharacters(999)).rejects.toThrow("Failed to fetch characters");
+    await expect(getCharacters(999)).rejects.toMatchObject({ message: "Failed to fetch characters", status: 404 });
   });
 
   it("propaga el fallo de red", async () => {
@@ -59,10 +59,13 @@ describe("getCharacter", () => {
     expect(fetchMock).toHaveBeenCalledExactlyOnceWith(`${API}/character/1`);
   });
 
-  it("lanza un error si el personaje no existe (404)", async () => {
+  it("lanza un ApiError con estado 404 si el personaje no existe", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ error: "Character not found" }, 404));
 
-    await expect(getCharacter("99999")).rejects.toThrow("Failed to fetch character details");
+    const error = await getCharacter("99999").catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ name: "ApiError", status: 404, message: "Failed to fetch character details" });
   });
 
   it("lanza un error si el servidor falla (500)", async () => {

@@ -1,6 +1,8 @@
-import { getCharacter, getEpisodes } from '@/lib/api';
+import { ApiError, getCharacter, getEpisodes } from '@/lib/api';
+import { formatCreatedDate, getEpisodeIds, getStatusColor, isValidCharacterId } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default async function CharacterPage({
   params,
@@ -8,20 +10,17 @@ export default async function CharacterPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const character = await getCharacter(id);
-  
-  const episodeIds = character.episode.map((url) => {
-    const parts = url.split('/');
-    return parts[parts.length - 1];
-  });
-  
-  const episodes = await getEpisodes(episodeIds);
+  // Un id que no es un entero positivo ("abc", "0") no puede existir: 404 sin llamar a la API.
+  if (!isValidCharacterId(id)) notFound();
 
-  const formattedDate = new Date(character.created).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  // Si la API responde 404, se muestra la página "not found" en lugar del error genérico.
+  const character = await getCharacter(id).catch((error: unknown) => {
+    if (error instanceof ApiError && error.status === 404) notFound();
+    throw error;
   });
+
+  const episodes = await getEpisodes(getEpisodeIds(character.episode));
+  const formattedDate = formatCreatedDate(character.created);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -46,10 +45,7 @@ export default async function CharacterPage({
             
             <div className="space-y-6 text-gray-300">
               <div className="flex items-center text-xl">
-                <span className={`h-4 w-4 rounded-full mr-3 ${
-                  character.status === 'Alive' ? 'bg-green-500' : 
-                  character.status === 'Dead' ? 'bg-red-500' : 'bg-gray-500'
-                }`} />
+                <span className={`h-4 w-4 rounded-full mr-3 ${getStatusColor(character.status)}`} aria-hidden="true" />
                 <span className="font-medium">{character.status} - {character.species}</span>
               </div>
 

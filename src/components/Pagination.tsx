@@ -10,7 +10,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
   const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 
   return (
-    <div className="flex justify-center items-center space-x-4 mt-8 mb-8">
+    <nav aria-label="Pagination" className="flex justify-center items-center space-x-4 mt-8 mb-8">
       {prevPage ? (
         <Link
           href={`/?page=${prevPage}`}
@@ -19,7 +19,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
           &larr; Previous
         </Link>
       ) : (
-        <span className="px-4 py-2 bg-gray-900 text-gray-600 rounded border border-gray-800 cursor-not-allowed">
+        <span aria-disabled="true" className="px-4 py-2 bg-gray-900 text-gray-600 rounded border border-gray-800 cursor-not-allowed">
           &larr; Previous
         </span>
       )}
@@ -36,10 +36,10 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
           Next &rarr;
         </Link>
       ) : (
-        <span className="px-4 py-2 bg-gray-900 text-gray-600 rounded border border-gray-800 cursor-not-allowed">
+        <span aria-disabled="true" className="px-4 py-2 bg-gray-900 text-gray-600 rounded border border-gray-800 cursor-not-allowed">
           Next &rarr;
         </span>
       )}
-    </div>
+    </nav>
   );
 }
