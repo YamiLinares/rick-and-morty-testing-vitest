@@ -1,0 +1,42 @@
+Transcripción de la ejecución final (la misma que muestra cobertura-vitest.png).
+Comando: npx vitest run --coverage
+Carpeta: rick-and-morty-testing-vitest   Fecha: 2026-10-26 15:03 (hora local)
+Código de salida: 0
+----------------------------------------------------------------------
+
+ RUN  v5.0.5 C:/Users/14dq5014la/Desktop/Kodigo/rick-and-morty-testing-vitest
+      Coverage enabled with v8
+
+
+ Test Files  8 passed (8)
+      Tests  89 passed (89)
+   Start at  15:03:08
+   Duration  3.76s (environment 57%, setup 20%, tests 14%, import 5%, worker 3%, transform 1%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |      100 |     100 |     100 |                   
+ app               |     100 |      100 |     100 |     100 |                   
+  error.tsx        |     100 |      100 |     100 |     100 |                   
+  layout.tsx       |     100 |      100 |     100 |     100 |                   
+  loading.tsx      |     100 |      100 |     100 |     100 |                   
+  not-found.tsx    |     100 |      100 |     100 |     100 |                   
+  page.tsx         |     100 |      100 |     100 |     100 |                   
+ ...character/[id] |     100 |      100 |     100 |     100 |                   
+  page.tsx         |     100 |      100 |     100 |     100 |                   
+ components        |     100 |      100 |     100 |     100 |                   
+  ...acterCard.tsx |     100 |      100 |     100 |     100 |                   
+  Pagination.tsx   |     100 |      100 |     100 |     100 |                   
+ lib               |     100 |      100 |     100 |     100 |                   
+  api.ts           |     100 |      100 |     100 |     100 |                   
+  utils.ts         |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 68/68 )
+Branches     : 100% ( 47/47 )
+Functions    : 100% ( 26/26 )
+Lines        : 100% ( 62/62 )
+================================================================================

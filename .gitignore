@@ -11,7 +11,7 @@
 !.yarn/versions
 
 # testing
-/coverage
+# coverage/ se versiona a propósito: el reporte HTML de cobertura es un entregable de la actividad.
 
 # next.js
 /.next/

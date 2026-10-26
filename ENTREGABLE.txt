@@ -1,0 +1,161 @@
+ENTREGABLE
+==========
+
+Actividad: Garantizar la calidad y estabilidad del software mediante la
+implementación de una pirámide de pruebas automatizadas.
+
+Proyecto: Rick and Morty Explorer (rick-and-morty-testing-vitest)
+Autora: YamiLinares
+
+Repositorio GitHub (fork público, verificado):
+https://github.com/YamiLinares/rick-and-morty-testing-vitest
+Fork de: https://github.com/Kodigo-academic/rick-and-morty-testing-activity
+
+DESCRIPCIÓN
+Rick and Morty Explorer es una aplicación hecha con Next.js 16 (App Router)
+que consume la API pública de Rick and Morty. Muestra una cuadrícula de
+personajes con paginación y una página de detalle con los datos de cada
+personaje y sus episodios. Sobre el proyecto base de la actividad agregué una
+suite de pruebas unitarias con Vitest y React Testing Library, medí la
+cobertura de código y corregí los defectos que encontré al probarlo.
+
+OBJETIVO GENERAL
+Asegurar la calidad y estabilidad del proyecto con pruebas automatizadas que
+alcancen al menos un 80 % de cobertura en statements, branches, functions y
+lines.
+
+OBJETIVOS ESPECÍFICOS
+- Configurar Vitest con jsdom, React Testing Library y cobertura V8.
+- Probar las funciones utilitarias y la lógica de negocio con casos normales,
+  límites y errores.
+- Probar los componentes React por su comportamiento visible y accesible.
+- Probar las llamadas a la API sin depender de Internet, simulando respuestas
+  correctas, vacías, errores HTTP y fallos de red.
+- Generar un reporte HTML de cobertura y dejar evidencia real de la ejecución.
+
+TECNOLOGÍAS
+Next.js 16.1.6, React 19.2.3, TypeScript 5.9, Tailwind CSS 4, pnpm 11.
+Pruebas: Vitest 5.0.5, @vitest/coverage-v8 5.0.5, @testing-library/react
+16.3.3, @testing-library/user-event 14.6.8, @testing-library/jest-dom 7.0.1,
+jsdom 30.1.3 y @vitejs/plugin-react 6.1.2.
+
+CONFIGURACIÓN DE VITEST (vitest.config.ts)
+- Plugin de React para JSX/TSX y alias "@/" hacia src/, igual que en
+  tsconfig.json.
+- Entorno jsdom, globals activados y archivo de preparación vitest.setup.ts
+  (matchers de jest-dom y limpieza del DOM después de cada prueba).
+- restoreMocks, clearMocks y unstubGlobals: ninguna prueba hereda mocks de
+  otra.
+- Cobertura con el proveedor v8 sobre todo src/. Solo se excluye src/types,
+  que tiene únicamente interfaces de TypeScript sin código ejecutable.
+- Reportes de consola (todos los archivos), HTML (coverage/index.html) y
+  lcov.info.
+- Umbrales del 80 % en las cuatro métricas. Comprobé que, si no se cumplen, el
+  comando termina con error (forcé un umbral de 101 % y salió con código 1).
+- Scripts: pnpm test, pnpm test:run y pnpm test:coverage.
+
+ESTRUCTURA DE LAS PRUEBAS (carpeta tests/, 8 archivos)
+- fixtures/rickandmorty.ts: datos de prueba pequeños y reutilizables.
+- lib/api.test.ts (12 pruebas) y lib/utils.test.ts (35).
+- components/CharacterCard.test.tsx (6) y components/Pagination.test.tsx (5).
+- app/home-page.test.tsx (10), app/character-page.test.tsx (13),
+  app/states.test.tsx (4) y app/layout.test.tsx (4).
+
+COMPONENTES PROBADOS
+- CharacterCard: nombre, estado, especie, ubicación, imagen con texto
+  alternativo, enlace al detalle y color del estado.
+- Pagination: página actual, enlaces anterior/siguiente, botones desactivados
+  en la primera y última página, y una sola página.
+- Páginas (Server Components): la principal y el detalle del personaje.
+- error.tsx (incluye un clic en "Try again"), loading.tsx, not-found.tsx y el
+  layout con su cabecera y enlaces externos seguros.
+
+FUNCIONES UTILITARIAS Y LÓGICA DE NEGOCIO PROBADAS (src/lib/utils.ts)
+- parsePageParam: convierte ?page= en una página válida (texto, cero,
+  negativos, decimales y parámetros repetidos vuelven a la página 1).
+- isValidCharacterId: acepta solo enteros positivos.
+- getEpisodeIds: extrae los ids de las URLs de episodios.
+- getStatusColor: color según el estado, con gris para estados desconocidos.
+- formatCreatedDate: fecha legible, o "Unknown" si no es válida.
+
+LLAMADAS ASÍNCRONAS Y API
+En las pruebas de src/lib/api.ts, fetch se reemplaza con vi.stubGlobal, así
+que ninguna prueba sale a Internet. Se cubren la respuesta correcta, la página
+por defecto, la lista vacía, los errores HTTP 404 y 500 (con su código en
+ApiError), el fallo de red, el caso de un solo episodio (la API devuelve un
+objeto) y el de ningún episodio (no se hace la petición). En las páginas, las
+funciones de la API se simulan con vi.mock: se comprueba qué se pide, qué se
+muestra, el estado vacío, el 404 y que los demás errores lleguen a error.tsx.
+
+DEFECTOS ENCONTRADOS Y CORREGIDOS
+- ?page=abc daba NaN y ?page=0 o -3 llegaban a la API ("Page NaN of 42"):
+  ahora vuelven a la página 1.
+- Una página inexistente (?page=999) mostraba el error genérico: ahora se ve
+  un estado vacío.
+- /character/abc o un personaje inexistente mostraban "We couldn't load the
+  characters": ahora muestran una página 404 propia.
+- Una lista vacía dejaba la pantalla en blanco: ahora aparece un mensaje.
+- Una fecha inválida mostraba "Invalid Date": ahora muestra "Unknown".
+- El color del estado estaba duplicado con dos lógicas distintas: ahora es una
+  sola función.
+- pnpm lint fallaba en error.tsx, y images.domains estaba obsoleto en Next.js
+  16: ambos corregidos.
+- pnpm 11 detenía la instalación por scripts de compilación ignorados: agregué
+  allowBuilds en pnpm-workspace.yaml.
+Para comprobar que las pruebas detectan errores, volví a poner temporalmente
+el parseInt original: fallaron 9 pruebas. Al restaurar la corrección pasaron
+todas.
+
+BUENAS PRÁCTICAS APLICADAS
+Cada prueba verifica un comportamiento concreto, con nombres descriptivos en
+español y agrupados con describe. Uso consultas accesibles (getByRole,
+getByText) en lugar de detalles internos del DOM y no uso snapshots. Las
+pruebas no dependen entre sí ni del orden: los mocks se limpian solos y el DOM
+se desmonta después de cada una. No hay esperas arbitrarias ni llamadas reales
+a la API. Las entradas y los resultados son explícitos, se prueban casos
+límite y de error, todo está tipado con TypeScript sin "any" y no desactivé
+ninguna regla de ESLint.
+
+COMANDOS
+pnpm install
+pnpm test:run               (ejecutar las pruebas)
+pnpm test:coverage          (pruebas + cobertura; equivale a vitest run --coverage)
+npx vitest run --coverage   (lo mismo, directamente)
+
+RESULTADOS REALES (ejecución final)
+- 8 archivos de prueba, 89 pruebas ejecutadas, 89 aprobadas, 0 fallidas.
+- Statements: 100 % (68/68)
+- Branches:   100 % (47/47)
+- Functions:  100 % (26/26)
+- Lines:      100 % (62/62)
+- Los 10 archivos de src/ medidos están al 100 %.
+- pnpm lint y pnpm typecheck: sin errores. pnpm build: correcto.
+
+UBICACIONES
+- Reporte HTML de cobertura: coverage/index.html
+- Captura de la consola: evidencias/cobertura-vitest.png
+- Transcripción de la consola: evidencias/resultado-vitest.txt
+- Capturas del reporte HTML: evidencias/reporte-html-cobertura.png y
+  evidencias/reporte-html-utils.png
+- Código fuente: src/ (aplicación) y tests/ (pruebas)
+- Carpeta local: C:\Users\14dq5014la\Desktop\Kodigo\rick-and-morty-testing-vitest
+
+COMMITS (los dos commits originales del proyecto base se conservan)
+1. test: configurar Vitest y herramientas de pruebas
+2. test: cubrir componentes y lógica de negocio
+3. docs: documentar cobertura y resultados de pruebas
+
+LIMITACIONES
+- Son pruebas unitarias. No incluí pruebas de extremo a extremo en un
+  navegador real; la navegación con la API real la revisé manualmente.
+- Las páginas son Server Components: pruebo su lógica y lo que renderizan,
+  pero no el streaming ni el código HTTP que genera Next.js.
+- La interfaz sigue en inglés, como en el proyecto base.
+
+CONCLUSIÓN
+Las pruebas automatizadas no solo sirvieron para llegar al porcentaje pedido.
+Al escribirlas aparecieron defectos que no se ven usando la app de forma
+normal, como el NaN en la paginación o el mensaje de error equivocado para un
+personaje que no existe. Con los umbrales configurados, cualquier cambio
+futuro que deje código sin probar o rompa un comportamiento hace fallar
+"pnpm test:coverage", lo que da confianza para seguir modificando el proyecto.
